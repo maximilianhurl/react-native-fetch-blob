@@ -37,7 +37,7 @@ NSMutableDictionary *fileStreams = nil;
 
 // static member getter
 + (NSArray *) getFileStreams {
-    
+
     if(fileStreams == nil)
         fileStreams = [[NSMutableDictionary alloc] init];
     return fileStreams;
@@ -71,12 +71,12 @@ NSMutableDictionary *fileStreams = nil;
 
 
 + (NSString *) getTempPath {
-    
+
     return [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject] stringByAppendingString:@"/RNFetchBlob_tmp"];
 }
 
 + (NSString *) getTempPath:(NSString*)taskId withExtension:(NSString *)ext {
-    
+
     NSString * documentDir = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
     NSString * filename = [NSString stringWithFormat:@"/RNFetchBlob_tmp/RNFetchBlobTmp_%@", taskId];
     if(ext != nil)
@@ -193,17 +193,17 @@ NSMutableDictionary *fileStreams = nil;
         [self.outStream close];
         self.outStream = nil;
     }
-    
+
 }
 
 - (void)readWithPath:(NSString *)path useEncoding:(NSString *)encoding bufferSize:(int) bufferSize {
-    
+
     self.inStream = [[NSInputStream alloc] initWithFileAtPath:path];
     self.inStream.delegate = self;
     self.encoding = encoding;
     self.path = path;
     self.bufferSize = bufferSize;
-    
+
     // NSStream needs a runloop so let's create a run loop for it
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,0);
     // start NSStream is a runloop
@@ -212,7 +212,7 @@ NSMutableDictionary *fileStreams = nil;
                             forMode:NSDefaultRunLoopMode];
         [inStream open];
         [[NSRunLoop currentRunLoop] run];
-        
+
     });
 }
 
@@ -224,7 +224,7 @@ NSMutableDictionary *fileStreams = nil;
         [[RNFetchBlobFS getFileStreams] setValue:nil forKey:self.streamId];
         self.streamId = nil;
     }
-    
+
 }
 
 void runOnMainQueueWithoutDeadlocking(void (^block)(void))
@@ -243,18 +243,18 @@ void runOnMainQueueWithoutDeadlocking(void (^block)(void))
 #pragma mark RNFetchBlobFS read stream delegate
 
 - (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)eventCode {
-    
+
     NSString * streamEventCode = [NSString stringWithFormat:@"RNFetchBlobStream+%@", self.path];
-    
+
     switch(eventCode) {
-            
+
             // write stream event
         case NSStreamEventHasSpaceAvailable:
         {
-            
-            
+
+
         }
-            
+
             // read stream incoming chunk
         case NSStreamEventHasBytesAvailable:
         {
@@ -274,7 +274,7 @@ void runOnMainQueueWithoutDeadlocking(void (^block)(void))
                 // dispatch data event
                 NSString * encodedChunk = [NSString alloc];
                 if( [[self.encoding lowercaseString] isEqualToString:@"utf8"] ) {
-                    encodedChunk = [encodedChunk initWithData:chunkData encoding:NSUTF8StringEncoding];
+                    encodedChunk = [encodedChunk initWithData:chunkData encoding:NSISOLatin1StringEncoding];
                 }
                 // when encoding is ASCII, send byte array data
                 else if ( [[self.encoding lowercaseString] isEqualToString:@"ascii"] ) {
@@ -324,7 +324,7 @@ void runOnMainQueueWithoutDeadlocking(void (^block)(void))
                      ];
                     return;
                 }
-                
+
                 [self.bridge.eventDispatcher
                  sendDeviceEventWithName:streamEventCode
                  body:@{
@@ -349,7 +349,7 @@ void runOnMainQueueWithoutDeadlocking(void (^block)(void))
             }
             break;
         }
-            
+
             // stream error
         case NSStreamEventErrorOccurred:
         {
@@ -362,9 +362,9 @@ void runOnMainQueueWithoutDeadlocking(void (^block)(void))
              ];
             break;
         }
-            
+
     }
-    
+
 }
 
 @end
